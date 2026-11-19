@@ -269,6 +269,8 @@ def reject_claim(claim_id):
     return redirect(url_for("dashboard"))
 
 
+initialize_database()
+
 if __name__ == "__main__":
-    initialize_database()
-    app.run(debug=True)
+    app.run(debug=False)
+    
