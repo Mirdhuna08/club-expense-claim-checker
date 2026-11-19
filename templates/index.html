@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Club Expense Claim Checker</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Club Expense Claim Checker</h1>
+    <p class="subtitle">Manage and check your club expenses</p>
+
+    {% if result %}
+        <div class="message">{{ result }}</div>
+    {% endif %}
+
+    <div class="card">
+        <h2>Submit Expense Claim</h2>
+
+        <form method="POST" action="/">
+
+            <label>Select Club</label>
+
+            <select name="club" required>
+                <option value="">Choose a club</option>
+                {% for club in clubs %}
+                    <option value="{{ club }}">{{ club }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Expense Description</label>
+
+            <textarea name="claim" rows="4"
+                placeholder="Example: Food expenses Rs. 500, bill attached"
+                required></textarea>
+
+            <button type="submit">Submit Claim</button>
+
+        </form>
+    </div>
+
+    <h2>Club Budget Details</h2>
+
+    <div class="budget-container">
+
+        {% for club, details in budget_details.items() %}
+
+        <div class="budget-card">
+
+            <h3>{{ club }}</h3>
+
+            <p>Total Budget:
+                ₹{{ "%.2f"|format(details.budget) }}</p>
+
+            <p>Approved:
+                ₹{{ "%.2f"|format(details.approved) }}</p>
+
+            <p>Pending:
+                ₹{{ "%.2f"|format(details.pending) }}</p>
+
+            <p>Remaining:
+                ₹{{ "%.2f"|format(details.remaining) }}</p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <h2>Expense Claim Dashboard</h2>
+
+    <div class="table-container">
+
+        <table>
+
+            <tr>
+                <th>ID</th>
+                <th>Club</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Bill</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+
+            {% for claim in claims %}
+
+            <tr>
+                <td>{{ claim.id }}</td>
+                <td>{{ claim.club }}</td>
+                <td>{{ claim.description }}</td>
+                <td>₹{{ "%.2f"|format(claim.amount) }}</td>
+                <td>{{ claim.category }}</td>
+
+                <td>
+                    {% if claim.bill_available %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+
+                <td>{{ claim.status }}</td>
+
+                <td>
+                    {% if claim.status == "Pending Approval" %}
+
+                    <form method="POST"
+                          action="/approve/{{ claim.id }}">
+                        <button class="approve">Approve</button>
+                    </form>
+
+                    <form method="POST"
+                          action="/reject/{{ claim.id }}">
+                        <button class="reject">Reject</button>
+                    </form>
+
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+
+            {% else %}
+
+            <tr>
+                <td colspan="8">No expense claims available.</td>
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>
